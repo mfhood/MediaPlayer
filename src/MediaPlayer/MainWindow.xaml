@@ -1,0 +1,144 @@
+﻿<Window x:Class="MediaPlayer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:MediaPlayer"
+        mc:Ignorable="d"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto"  
+        Background="Transparent"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        WindowStyle="None" WindowStartupLocation="CenterScreen" 
+        MouseLeftButtonDown="Window_MouseLeftButtonDown"
+        x:Name="Root" 
+        Loaded="Window_Loaded" Closing="Root_Closing"
+        MouseDoubleClick="Root_MouseDoubleClick" AllowDrop="True" 
+        Title="MediaPlayer" Height="350" Width="600" KeyDown="Root_KeyDown" Drop="Root_Drop" MouseMove="Root_MouseMove">
+    <Window.Resources>
+        <materialDesign:NotConverter x:Key="NotConverter"/>
+        <materialDesign:MathConverter Operation="Subtract" x:Key="MathConverter"/>
+    </Window.Resources>
+    <Grid>
+        <materialDesign:DialogHost x:Name="RootDialogHost">
+            <materialDesign:DialogHost.DialogContent>
+                <StackPanel Margin="16">
+                    <TextBlock Text="请输入URL:"/>
+                    <TextBox
+                                Margin="0 8 0 0" x:Name="UrlTextBox"
+                                HorizontalAlignment="Stretch"/>
+                    <StackPanel
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right">
+                        <Button
+                                    Style="{StaticResource MaterialDesignFlatButton}"
+                                    IsDefault="True"
+                                    Margin="0 8 8 0" Click="networkStreamBpx_Click"
+                                    Content="确认" CommandParameter="True"
+                                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
+                        </Button>
+
+                        <Button
+                                    Style="{StaticResource MaterialDesignFlatButton}"
+                                    IsCancel="True"
+                                    Margin="0 8 8 0"
+                                    Content="取消" CommandParameter="False"
+                                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </materialDesign:DialogHost.DialogContent>
+            <Grid>
+                <Border>
+                    <Border.BorderBrush>
+                        <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                            <GradientStop Offset="0" Color="#3C4144"/>
+                            <GradientStop Offset="0.5" Color="#222425"/>
+                        </LinearGradientBrush>
+                    </Border.BorderBrush>
+                    <MediaElement MediaEnded="mediaElement_MediaEnded" 
+                              Name="mediaElement" MediaOpened="mediaElement_MediaOpened" 
+                              Volume="{Binding ElementName=volumeSlider, Path=Value}" 
+                              UnloadedBehavior="Stop" Stretch="Uniform"  LoadedBehavior="Manual" 
+                              AllowDrop="True" 
+                              MouseDown="mediaElement_MouseDown" PreviewMouseUp="mediaElement_PreviewMouseUp" />
+                </Border>
+                <Canvas>
+                    <StackPanel x:Name="WindowSizeContrlBtn" Canvas.Right="0" Height="32" Orientation="Horizontal" Background="AliceBlue" Opacity="0.5" VerticalAlignment="Top" HorizontalAlignment="Right">
+                        <Button Style="{StaticResource MaterialDesignToolButton}" x:Name="MinBtn" Click="MinBtn_Click">
+                            <materialDesign:PackIcon Kind="WindowMinimize"/>
+                        </Button>
+                        <Button Style="{StaticResource MaterialDesignToolButton}" x:Name="MaxBtn" Click="MaxBtn_Click">
+                            <materialDesign:PackIcon Kind="WindowMaximize" x:Name="MaxWindowIcon"/>
+                        </Button>
+                        <Button Style="{StaticResource MaterialDesignToolButton}" x:Name="CloseBtn" Click="CloseBtn_Click">
+                            <materialDesign:PackIcon Kind="WindowClose" />
+                        </Button>
+                    </StackPanel>
+                    <StackPanel x:Name="StatusInfo" Canvas.Bottom="0" Background="AliceBlue" Opacity="0.5" Width="{Binding ActualWidth, ElementName=Root, Mode=OneWay}" >
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                            <Slider  VerticalAlignment="Center" Name="timelineSlider" Margin="10 0" HorizontalAlignment="Center"  
+                            Width="{Binding ActualWidth, Converter={StaticResource MathConverter},ConverterParameter=140, ElementName=Root, Mode=OneWay}" PreviewMouseUp="timelineSlider_PreviewMouseUp" />
+                            <TextBlock Text="00:00:00" Width="50" VerticalAlignment="Center" x:Name="txtTime"/>
+                            <TextBlock Text="/00:00:00" Width="60" VerticalAlignment="Center" x:Name="totalTime"/>
+                        </StackPanel>
+                        <DockPanel>
+                            <Button x:Name="openBtn" Style="{StaticResource MaterialDesignIconButton}" Click="openBtn_Click">
+                                <materialDesign:PackIcon Kind="FileVideo"/>
+                            </Button>
+                            <StackPanel HorizontalAlignment="Left"  Orientation="Horizontal">
+                                <Button x:Name="playBtn" Style="{StaticResource MaterialDesignIconButton}" Click="playBtn_Click">
+                                    <materialDesign:PackIcon Kind="Play"/>
+                                </Button>
+                                <Button x:Name="pauseBtn" Style="{StaticResource MaterialDesignIconButton}" Click="pauseBtn_Click">
+                                    <materialDesign:PackIcon Kind="Pause"/>
+                                </Button>
+                                <Button x:Name="stopBtn" Style="{StaticResource MaterialDesignIconButton}" Click="stopBtn_Click">
+                                    <materialDesign:PackIcon Kind="Stop"/>
+                                </Button>
+                                <Button x:Name="SkipBackwardBtn" Style="{StaticResource MaterialDesignIconButton}" Click="SkipBackwardBtn_Click">
+                                    <materialDesign:PackIcon Kind="SkipBackward"/>
+                                </Button>
+                                <Button x:Name="backBtn" Style="{StaticResource MaterialDesignIconButton}" Click="backBtn_Click">
+                                    <materialDesign:PackIcon Kind="StepBackward"/>
+                                </Button>
+                                <Button x:Name="forwardBtn" Style="{StaticResource MaterialDesignIconButton}" Click="forwardBtn_Click">
+                                    <materialDesign:PackIcon Kind="StepForward"/>
+                                </Button>
+                                <Button x:Name="SkipForwardBtn" Style="{StaticResource MaterialDesignIconButton}" Click="SkipForwardBtn_Click">
+                                    <materialDesign:PackIcon Kind="SkipForward"/>
+                                </Button>
+                                <Button x:Name="LoopPlayBtn" Style="{StaticResource MaterialDesignIconButton}" Click="LoopPlayBtn_Click">
+                                    <materialDesign:PackIcon Kind="Loop"/>
+                                </Button>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                                <Button Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}" x:Name="networkStreamBpx" 
+                                Style="{StaticResource MaterialDesignIconButton}" materialDesign:RippleAssist.IsCentered="True">
+                                    <materialDesign:PackIcon Kind="Cloud" />
+                                </Button>
+                                <Button Style="{StaticResource MaterialDesignIconButton}" Click="IsMutedBtn_Click" materialDesign:RippleAssist.IsCentered="True">
+                                    <materialDesign:PackIcon Name="IsMutedIcon" Kind="VolumeHigh" />
+                                </Button>
+                                <Slider x:Name="volumeSlider" ValueChanged="volumeSlider_ValueChanged" Minimum="0" VerticalAlignment="Center" Maximum="1" Value="{Binding Volume, ElementName=mediaElement}" Width="70" Margin="5 0"/>
+                                <materialDesign:PopupBox x:Name="OptionItemsBox"  PlacementMode="TopAndAlignRightEdges" Margin="0 0 20 0"
+                                    ToolTipService.Placement="Right">
+                                    <StackPanel>
+                                        <CheckBox x:Name="IsAllowsTransparencyCheckBox" Style="{StaticResource MaterialDesignLightCheckBox}" Content="无边框(重启)"/>
+                                        <CheckBox Style="{StaticResource MaterialDesignLightCheckBox}" IsChecked="{Binding ElementName=Root,Path=Topmost}" Content="窗口置顶"/>
+                                        <CheckBox x:Name="IsAllSearchOptionCheckBox" Style="{StaticResource MaterialDesignLightCheckBox}" Click="IsAllSearchOptionCheckBox_Click"  Content="全局搜索"/>
+                                        <CheckBox x:Name="IsFixedWindowSizeCheckBox" Style="{StaticResource MaterialDesignLightCheckBox}"  Content="固定窗口大小"/>
+                                    </StackPanel>
+                                </materialDesign:PopupBox>
+                            </StackPanel>
+                        </DockPanel>
+                    </StackPanel>
+                </Canvas>
+            </Grid>
+        </materialDesign:DialogHost>
+    </Grid>
+</Window>
